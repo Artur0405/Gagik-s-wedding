@@ -108,11 +108,38 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function schedule(fn, ms) { envelopeTimers.push(setTimeout(fn, ms)); }
 
+  /* ---- Wedding music — plays once, on the FIRST open only ----
+     Created via the Audio constructor so no audio UI is rendered.
+     play() is called synchronously inside the click/tap handler
+     (via openEnvelope → startMusicOnce) so mobile browsers accept
+     it as a user-initiated gesture. Subsequent opens/closes do not
+     restart, pause, or re-trigger playback. */
+  const weddingMusic = new Audio('assets/music/song.mp3');
+  weddingMusic.preload = 'auto';
+  let musicStarted = false;
+  function startMusicOnce() {
+    if (musicStarted) return;
+    musicStarted = true;
+    const playPromise = weddingMusic.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch((err) => {
+        // Browser rejected play() (very rare inside a user gesture).
+        // Allow a retry on the next user interaction.
+        console.warn('[Wedding] Music play() was rejected:', err);
+        musicStarted = false;
+      });
+    }
+  }
+
   function openEnvelope() {
     if (envelopeOpen || envelopeTransitioning) return;
     envelopeOpen = true;
     envelopeTransitioning = true;
     clearEnvelopeTimers();
+
+    // Kick off the music on the FIRST open only. The call is synchronous
+    // inside the user-gesture call stack so mobile browsers honour it.
+    startMusicOnce();
 
     // Step 1 — Hide wax seal (it "breaks" as flap opens)
     schedule(() => envelopeSeal && envelopeSeal.classList.add('is-hidden'), 500);
