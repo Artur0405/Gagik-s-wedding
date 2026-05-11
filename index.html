@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Գագիկ &amp; Ջուլիա — Հարսանյաց Հրավիրատոմս</title>
+  <link rel="stylesheet" href="style.css?v=0.28" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Great+Vibes&family=Inter:wght@300;400;500&family=Noto+Serif+Armenian:wdth,wght@62.5,100&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ============================================================
+       INTRO VIDEO OVERLAY
+  ============================================================ -->
+  <div id="intro-overlay" class="intro-overlay" aria-hidden="true">
+    <video
+      id="intro-video"
+      class="intro-video"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+    >
+      <source src="assets/ссс.mp4" type="video/mp4" />
+    </video>
+    <div class="intro-vignette"></div>
+    <button class="intro-skip" id="intro-skip" aria-label="Բաց թողնել">
+      Բաց թողնել
+    </button>
+  </div>
+
+
+  <!-- ============================================================
+       MAIN SITE CONTENT
+  ============================================================ -->
+  <main id="main-content" class="main-content" style="opacity:0; pointer-events:none;">
+
+    <!-- ============================================================
+         SECTION 1: HERO — Animated Envelope & Letter Reveal
+         DO NOT TOUCH: animation, layout, background all intact
+    ============================================================ -->
+    <section class="hero" id="hero">
+      <div class="hero-bg-pattern"></div>
+
+      <div class="envelope-scene" id="envelope-scene" aria-label="Wedding invitation envelope — tap to open">
+
+        <div class="envelope" id="envelope">
+
+          <!-- Back body: warm kraft/cardboard paper with grain and fold crease lines -->
+          <svg class="envelope__back" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="env-back" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%"   stop-color="#f3d5d4"/>
+                <stop offset="45%"  stop-color="#e6bdbb"/>
+                <stop offset="100%" stop-color="#cea4a4"/>
+              </linearGradient>
+              <!-- Soft cardboard grain: subtle fibre look, premium not noisy.
+                   Final feComposite clips the result to the source shape so the
+                   filter never paints outside the polygon's silhouette. -->
+              <filter id="env-pg" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="2" stitchTiles="stitch" result="noise"/>
+                <feColorMatrix type="saturate" values="0" in="noise" result="gNoise"/>
+                <feComponentTransfer in="gNoise" result="subtleNoise">
+                  <feFuncA type="table" tableValues="0 0.055"/>
+                </feComponentTransfer>
+                <feBlend mode="multiply" in2="SourceGraphic" result="blended"/>
+                <feComposite in="blended" in2="SourceGraphic" operator="in"/>
+              </filter>
+              <!-- Long horizontal cardboard fibre streaks, very gentle. Same
+                   feComposite clip keeps the streaks inside the source shape. -->
+              <filter id="env-fibre" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+                <feTurbulence type="fractalNoise" baseFrequency="0.012 0.85" numOctaves="2" stitchTiles="stitch" result="streaks"/>
+                <feColorMatrix type="saturate" values="0" in="streaks" result="gStreaks"/>
+                <feComponentTransfer in="gStreaks" result="softStreaks">
+                  <feFuncA type="table" tableValues="0 0.035"/>
+                </feComponentTransfer>
+                <feBlend mode="multiply" in2="SourceGraphic" result="blended"/>
+                <feComposite in="blended" in2="SourceGraphic" operator="in"/>
+              </filter>
+            </defs>
+            <!-- Base paper rectangle -->
+            <rect x="0" y="0" width="420" height="300" rx="2" fill="url(#env-back)" filter="url(#env-pg)"/>
+            <!-- Long fibre streaks layered on top -->
+            <rect x="0" y="0" width="420" height="300" rx="2" fill="#d8b0ad" filter="url(#env-fibre)" opacity="0.45"/>
+            <!-- Diagonal fold crease lines (top corners → centre, bottom corners → centre) -->
+            <path d="M0,0 L210,165 L420,0"   fill="none" stroke="#a06870" stroke-width="1.2" stroke-opacity="0.32"/>
+            <path d="M0,300 L210,165 L420,300" fill="none" stroke="#a06870" stroke-width="1.1" stroke-opacity="0.28"/>
+            <!-- Vertical edge lines -->
+            <line x1="0"   y1="0" x2="0"   y2="300" stroke="#b48289" stroke-width="1" stroke-opacity="0.22"/>
+            <line x1="420" y1="0" x2="420" y2="300" stroke="#b48289" stroke-width="1" stroke-opacity="0.22"/>
+          </svg>
+
+          <!-- Top flap: HTML div for 3D rotateX animation; SVG triangle is the visual shape -->
+          <div class="envelope__flap" id="envelope-flap">
+            <svg class="envelope__flap-svg" viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points="0,0 420,0 210,165" fill="#ecc5c1" filter="url(#env-pg)"/>
+            </svg>
+          </div>
+
+          <div class="envelope__letter" id="envelope-letter">
+            <div class="letter-inner">
+              <div class="letter-content">
+                <!-- <span class="letter-ornament">✦</span> -->
+                <h1 class="letter-names">
+                  Gagik<br />
+                  <span class="letter-ampersand">&amp;</span><br />
+                  Julia
+                </h1>
+                <p class="letter-invite-text">ուրախությամբ հրավիրում են Ձեզ տոնելու</p>
+                <p class="letter-event">Մեր Հարսանյաց Օրը</p>
+                <p class="letter-date">Շաբաթ, Օգոստոս 29<br />2026</p>
+                <!-- <span class="letter-ornament letter-ornament--bottom">✦</span> -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Front/bottom fold: two triangles meeting at centre fold point -->
+          <svg class="envelope__front" viewBox="0 0 420 165" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,165 210,0 210,165"   fill="#dab1b0" filter="url(#env-pg)"/>
+            <polygon points="420,165 210,0 210,165" fill="#dab1b0" filter="url(#env-pg)"/>
+          </svg>
+
+          <!-- Left side triangle -->
+          <svg class="envelope__side envelope__side--left" viewBox="0 0 210 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="0,0 210,150 0,300" fill="#c4a1a1" filter="url(#env-pg)"/>
+          </svg>
+
+          <!-- Right side triangle -->
+          <svg class="envelope__side envelope__side--right" viewBox="0 0 210 300" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="210,0 0,150 210,300" fill="#b89797" filter="url(#env-pg)"/>
+          </svg>
+
+          <!-- Wax seal: organic amber blob from new design, with G & L initials -->
+          <div class="envelope__seal" id="envelope-seal">
+            <svg class="seal-svg" viewBox="-65 -65 130 130" xmlns="http://www.w3.org/2000/svg" overflow="visible" aria-hidden="true">
+              <defs>
+                <radialGradient id="env-wax" cx="45%" cy="35%" r="70%">
+                  <stop offset="0%"   stop-color="#f3d4c2"/>
+                  <stop offset="45%"  stop-color="#c98a82"/>
+                  <stop offset="100%" stop-color="#8b5854"/>
+                </radialGradient>
+              </defs>
+              <!-- Organic wax blob -->
+              <path d="M-48,-8 C-55,-35 -28,-53 -5,-45 C12,-60 52,-45 50,-10 C65,8 45,45 12,42 C-10,58 -52,35 -45,5 C-60,0 -56,-16 -48,-8 Z"
+                    fill="url(#env-wax)"/>
+              <!-- Stamp ring -->
+              <circle cx="0" cy="0" r="38" fill="none" stroke="#7a3e44" stroke-width="2" opacity="0.45"/>
+              <!-- Initials -->
+              <text x="0" y="0" text-anchor="middle" dominant-baseline="central"
+                    font-family="'Great Vibes', cursive" font-size="18"
+                    fill="#5a3035" opacity="0.88">G &amp; L</text>
+            </svg>
+          </div>
+        </div>
+
+        <p class="envelope-tap-hint">Հպել՝ բացելու համար</p>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         ALL SECTIONS BELOW HERO2026
+         Wrapped in .below-hero for shared Swan.webp background
+         with vertical gradient overlay
+    ============================================================ -->
+    <div class="below-hero">
+
+      <!-- COUPLE — names + portrait card -->
+      <section class="ig-section ig-couple reveal-section" id="couple">
+        <div class="ig-container">
+          <img src="assets/SVG/wedding_calendar.svg" alt="" class="ig-container-calendar" loading="lazy" />
+          <!-- <p class="ig-eyebrow reveal-item">Հարսանյաց հրավիրատոմս</p>
+          <h2 class="ig-couple-names reveal-item" style="animation-delay:0.1s">
+            <span>Gagik</span>
+            <span class="ig-amp">&amp;</span>
+            <span>Julia</span>
+          </h2> -->
+          <div class="ig-photo-card reveal-item" style="animation-delay:0.2s">
+            <img src="assets/photo_2.webp" alt="Gagik and Julia" loading="lazy" />
+          </div>
+          <p class="ig-tagline reveal-item" style="animation-delay:0.3s">
+            Սիրով հրավիրում ենք Ձեզ տոնելու<br/>մեր սիրո օրը
+          </p>
+        </div>
+      </section>
+
+
+      <!-- DATE — calendar-style card -->
+      <!-- <section class="ig-section ig-date-section reveal-section" id="date">
+        <div class="ig-container">
+          <p class="ig-eyebrow reveal-item">Save the Date</p>
+          <div class="ig-date-card reveal-item" style="animation-delay:0.1s">
+            <p class="ig-date-day">Շաբաթ</p>
+            <div class="ig-date-row">
+              <span class="ig-date-side">08</span>
+              <span class="ig-date-number">29</span>
+              <span class="ig-date-side">2026</span>
+            </div>
+            <p class="ig-date-month">Օգոստոս</p>
+          </div>
+        </div>
+      </section> -->
+
+
+      <!-- TIMELINE — schedule of the day -->
+      
+      
+      <!-- CEREMONY LOCATION CARD -->
+      <section class="ig-section ig-venue reveal-section" id="ceremony">
+        <div class="ig-container">
+          <h2 class="ig-section-title reveal-item" style="animation-delay:0.1s">Օրվա Ծրագիր</h2>
+          <!-- <p class="ig-eyebrow reveal-item">Պսակադրությունը կանցկացվի <br> Սուրբ Գրիգոր Լուսավորիչ եկեղեում</p> -->
+          <div class="ig-venue-illustration reveal-item" style="animation-delay:0.05s" aria-hidden="true">
+            <img src="assets/SVG/church.svg" alt="" loading="lazy" />
+          </div>
+          <h2 class="ig-venue-name reveal-item" style="animation-delay:0.1s">Պսակադրությունը կանցկացվի <br> Սուրբ Գրիգոր Լուսավորիչ եկեղեում</h2>
+          <!-- <p class="ig-venue-time reveal-item" style="animation-delay:0.15s">Արարողություն · 15:00</p> -->
+          <!-- <p class="ig-venue-address reveal-item" style="animation-delay:0.2s">
+            Երվանդ Քոչարի փող.<br/>Երևան, Հայաստան
+          </p> -->
+          <a href="https://yandex.com/navi/org/102654452262?si=f83xkdnyqgyjpxt0g62f8j57f4"
+          target="_blank" rel="noopener noreferrer"
+          class="ig-button ig-button--with-pin reveal-item" style="animation-delay:0.25s">
+          <img src="assets/SVG/map_mark.svg" alt="" class="ig-button-pin" loading="lazy" />
+          <span>քարտեզ</span>
+        </a>
+      </div>
+    </section>
+    
+    
+    <!-- RECEPTION LOCATION CARD -->
+    <section class="ig-section ig-venue reveal-section" id="reception">
+      <div class="ig-container">
+        <!-- <p class="ig-eyebrow reveal-item">Reception</p> -->
+        <div class="ig-venue-illustration ig-venue-illustration--wide reveal-item" style="animation-delay:0.05s" aria-hidden="true">
+          <img src="assets/SVG/restoran.svg" alt="" loading="lazy" />
+        </div>
+        <h2 class="ig-venue-name reveal-item" style="animation-delay:0.1s">Տոնական Խնջույքը կանցկացվի Ծիրանի ռեստորանում</h2>
+        <!-- <p class="ig-venue-time reveal-item" style="animation-delay:0.15s">Տոնակատարություն · 17:00</p> -->
+        <!-- <p class="ig-venue-address reveal-item" style="animation-delay:0.2s">
+          Բաբաջանյան բլոկ 3/1, Առինջ<br/>Երևան, Հայաստան
+        </p> -->
+        <a href="https://yandex.com/navi/org/216491412456?si=f83xkdnyqgyjpxt0g62f8j57f4"
+        target="_blank" rel="noopener noreferrer"
+        class="ig-button ig-button--with-pin reveal-item" style="animation-delay:0.25s">
+        <img src="assets/SVG/map_mark.svg" alt="" class="ig-button-pin" loading="lazy" />
+        <span>քարտեզ</span>
+      </a>
+    </div>
+  </section>
+  
+  <!-- DAY SCHEDULE — centered vertical timeline -->
+  <section class="ig-section ig-timeline-section reveal-section" id="timeline">
+    <div class="ig-container">
+      <div class="timeline-vertical-line"></div>
+      
+      <!-- <ol class="ig-timeline"> -->
+        <li class="ig-timeline-item reveal-item" style="animation-delay:0.15s">
+          <!-- <div class="ig-timeline-icon" aria-hidden="true">
+            <img src="assets/SVG/church.svg" alt="" loading="lazy" />
+          </div> -->
+          <p class="ig-timeline-time">15:00</p>
+          <h3 class="ig-timeline-title">Պսակադրություն</h3>
+          <!-- <p class="ig-timeline-place">Սուրբ Գրիգոր Լուսավորիչ</p>
+          <p class="ig-timeline-sub">Երվանդ Քոչարի փող., Երևան</p> -->
+        </li>
+        <div class="timeline-vertical-line"></div>
+        <li class="ig-timeline-item reveal-item" style="animation-delay:0.25s">
+          <!-- <div class="ig-timeline-icon" aria-hidden="true">
+            <img src="assets/SVG/champagne_glasses.svg" alt="" loading="lazy" />
+          </div> -->
+          <p class="ig-timeline-time">17:00</p>
+          <h3 class="ig-timeline-title">Տոնակատարություն</h3>
+          <!-- <p class="ig-timeline-place">Ծիրանի</p>
+          <p class="ig-timeline-sub">Բաբաջանյան բլոկ 3/1, Առինջ</p> -->
+        </li>
+      <!-- </ol> -->
+    </div>
+  </section>
+  
+      <!-- GALLERY -->
+      <section class="ig-section ig-gallery-section reveal-section" id="gallery">
+        <div class="ig-container">
+          <!-- <p class="ig-eyebrow reveal-item">Memories</p> -->
+          <!-- <h2 class="ig-section-title reveal-item" style="animation-delay:0.1s">Մեր պատմությունը</h2> -->
+          <div class="gallery-stack-wrap reveal-item" style="animation-delay:0.2s">
+            <div class="gallery-stack" id="gallery-stack">
+              <div class="gallery-card is-hidden" data-index="5">
+                <img src="assets/photo_6.webp" alt="Photo 6" loading="lazy" />
+              </div>
+              <div class="gallery-card is-hidden" data-index="4">
+                <img src="assets/photo_5.webp" alt="Photo 5" loading="lazy" />
+              </div>
+              <div class="gallery-card is-hidden" data-index="3">
+                <img src="assets/photo_4.webp" alt="Photo 4" loading="lazy" />
+              </div>
+              <div class="gallery-card is-next2" data-index="2">
+                <img src="assets/photo_3.webp" alt="Photo 3" loading="lazy" />
+              </div>
+              <div class="gallery-card is-next" data-index="1">
+                <img src="assets/photo_2.webp" alt="Photo 2" loading="lazy" />
+              </div>
+              <div class="gallery-card is-active" data-index="0">
+                <img src="assets/photo_1.webp" alt="Photo 1" loading="eager" />
+              </div>
+            </div>
+
+            <div class="gallery-controls">
+              <button class="gallery-btn gallery-btn--prev" id="gallery-prev" aria-label="Previous photo">&#8249;</button>
+              <div class="gallery-dots" id="gallery-dots">
+                <span class="gallery-dot is-active" data-goto="0"></span>
+                <span class="gallery-dot" data-goto="1"></span>
+                <span class="gallery-dot" data-goto="2"></span>
+                <span class="gallery-dot" data-goto="3"></span>
+                <span class="gallery-dot" data-goto="4"></span>
+                <span class="gallery-dot" data-goto="5"></span>
+              </div>
+              <button class="gallery-btn gallery-btn--next" id="gallery-next" aria-label="Next photo">&#8250;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- RSVP -->
+      <section class="ig-section ig-rsvp reveal-section" id="rsvp">
+        <div class="ig-container">
+          <!-- <p class="ig-eyebrow reveal-item">RSVP</p> -->
+          <p class="ig-rsvp-intro reveal-item" style="animation-delay:0.05s">
+            Խնդրում ենք հաստատել<br/>Ձեր ներկայությունը։
+          </p>
+
+          <form id="rsvp-form" class="ig-rsvp-form reveal-item" style="animation-delay:0.1s" novalidate>
+
+            <!-- Name -->
+            <div class="ig-field">
+              <label for="rsvp-name" class="ig-field-label">
+                Ձեր անուն/ազգանունը
+              </label>
+              <input type="text" id="rsvp-name" name="name"
+                     class="ig-input"
+                     autocomplete="name"
+                     placeholder="Օր.՝ Արամ Հակոբյան" />
+            </div>
+            <hr class="ig-form-divider" />
+            <!-- Guest count — separate field -->
+            <div class="ig-field">
+              <label for="rsvp-guests" class="ig-field-label">
+                Հրավիրված անձանց թվաքանակը
+              </label>
+              <input type="number" id="rsvp-guests" name="guests"
+                     class="ig-input"
+                     min="1" max="10" step="1" inputmode="numeric"
+                     placeholder="Օր.՝ 2" />
+            </div>
+
+            <hr class="ig-form-divider" />
+
+            <!-- Will you attend? -->
+            <fieldset class="ig-field-group">
+              <legend class="ig-field-label">Կկարողանա՞ք ներկա գտնվել միջոցառմանը</legend>
+              <label class="ig-radio">
+                <input type="radio" name="attending" value="yes" />
+                <span class="ig-radio-mark"></span>
+                <span class="ig-radio-text">Այո, կգամ</span>
+              </label>
+              <label class="ig-radio">
+                <input type="radio" name="attending" value="no" />
+                <span class="ig-radio-mark"></span>
+                <span class="ig-radio-text">Ցավոք, չեմ կարողանա</span>
+              </label>
+            </fieldset>
+
+            <hr class="ig-form-divider" />
+
+            <!-- Invited by whom? -->
+            <fieldset class="ig-field-group">
+              <legend class="ig-field-label">ՈՒ՞մ կողմից եք հրավիրված</legend>
+              <label class="ig-checkbox">
+                <input type="checkbox" name="invitedBy" value="Gagik" />
+                <span class="ig-checkbox-mark"></span>
+                <span class="ig-checkbox-text">Գագիկ</span>
+              </label>
+              <label class="ig-checkbox">
+                <input type="checkbox" name="invitedBy" value="Juli" />
+                <span class="ig-checkbox-mark"></span>
+                <span class="ig-checkbox-text">Ջուլիա</span>
+              </label>
+            </fieldset>
+
+            <button type="submit" class="ig-button ig-button--submit">Ուղարկել</button>
+
+            <p id="rsvp-status" class="ig-rsvp-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+
+
+      <!-- CLOSING — full-bleed B&W couple photo with elegant overlay text -->
+      <section class="ig-bottom-hero reveal-section" id="closing" aria-label="Closing">
+        <div class="ig-bottom-hero-photo">
+          <img src="assets/photo_1.webp" alt="Gagik and Julia" loading="lazy" />
+        </div>
+        <div class="ig-bottom-hero-overlay"></div>
+        <div class="ig-bottom-hero-content">
+          <p class="ig-closing-script reveal-item">Մեծ սիրով</p>
+          <h2 class="ig-closing-names reveal-item" style="animation-delay:0.1s">Gagik &amp; Julia</h2>
+          <p class="ig-closing-date reveal-item" style="animation-delay:0.2s">29 · 08 · 2026</p>
+        </div>
+      </section>
+
+
+      <footer class="ig-footer">
+        <p>Gagik &amp; Julia &nbsp;·&nbsp; 2026</p>
+      </footer>
+
+    </div>
+    <!-- End below-hero -->
+
+  </main>
+
+  <script src="script.js?v=0.13"></script>
+</body>
+</html>

@@ -1,0 +1,1397 @@
+/* ============================================================
+   WEDDING INVITATION WEBSITE — style.css
+   Palette: ivory (#faf3f3), cream (#f7eaea), warm beige (#ecd6d6),
+            muted brown (#a07480), deep sepia (#3d2a2e),
+            dusty rose accent (#c4929c), gold accent (#c4949c)
+   Fonts: Great Vibes (script), Cormorant Garamond (serif), Inter (body)
+   ============================================================ */
+
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background-color: #faf3f3;
+  color: #3d2a2e;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+address {
+  font-style: normal;
+}
+
+/* ============================================================
+   ARMENIAN TYPOGRAPHY
+   All elements carrying Armenian text use Noto Serif Armenian
+   at weight 100, width 62.5. Great Vibes is re-asserted on the
+   specific name elements (Gagik & Julia) that must stay script.
+   ============================================================ */
+.letter-invite-text,
+.letter-event,
+.letter-date,
+.intro-skip,
+.detail-card__title,
+.detail-card__value,
+.detail-card__sub,
+.venue-time,
+.venue-heading,
+.venue-address,
+.closing-heading,
+.closing-date,
+.site-footer p {
+  font-family: 'Noto Serif Armenian', serif;
+  font-weight: 100;
+  font-variation-settings: 'wdth' 62.5;
+}
+
+/* Restore script font on Latin name spans inside closing heading */
+.closing-heading em {
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-variation-settings: normal;
+}
+
+
+/* ============================================================
+   TYPOGRAPHY HELPERS
+   ============================================================ */
+.section-label {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: #c4949c;
+  margin-bottom: 1.25rem;
+}
+
+.section-label--light {
+  color: rgba(250, 244, 244, 0.75);
+}
+
+.section-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.25;
+  color: #3d2a2e;
+  margin-bottom: 2rem;
+}
+
+.section-heading--light {
+  color: #faf3f3;
+}
+
+/* Thin decorative horizontal rule */
+.ornament-rule {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 2rem 0;
+}
+.ornament-rule span:not(.ornament-diamond) {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #c4949c, transparent);
+}
+.ornament-diamond {
+  font-size: 0.5rem;
+  color: #c4949c;
+  flex: none;
+}
+
+/* ============================================================
+   LAYOUT CONTAINER
+   ============================================================ */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+/* ============================================================
+   INTRO VIDEO OVERLAY
+   ============================================================ */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a0705;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-overlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Slight warm sepia tint via CSS filter */
+  filter: brightness(0.88) saturate(0.85) sepia(0.15);
+}
+
+/* Vignette gradient over the video */
+.intro-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center,
+    transparent 40%,
+    rgba(10, 7, 5, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+/* Skip button */
+.intro-skip {
+  position: absolute;
+  bottom: 2.5rem;
+  right: 2.5rem;
+  background: transparent;
+  border: 1px solid rgba(250, 244, 244, 0.45);
+  color: rgba(250, 244, 244, 0.75);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding: 0.65rem 1.4rem;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+}
+.intro-skip:hover {
+  background: rgba(250, 244, 244, 0.12);
+  border-color: rgba(250, 244, 244, 0.7);
+  color: #faf3f3;
+}
+
+
+/* ============================================================
+   MAIN CONTENT — initially hidden, JS reveals it
+   ============================================================ */
+.main-content {
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ============================================================
+   SCROLL REVEAL ANIMATION SYSTEM
+   Elements with .reveal-item start invisible and slide up.
+   JS adds .is-visible when they enter the viewport.
+   ============================================================ */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   SECTION 2: HERO — Animated Envelope
+   ============================================================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 1rem;
+}
+
+/* photo_3 background image, slightly transparent over white base */
+.hero-bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url('assets/photo_3.webp?v=1');
+  background-size: cover;
+  background-position: center;
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+/* ---- ENVELOPE SCENE ---- */
+.envelope-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+  outline: none;
+}
+
+/* While envelope is closed and ready, indicate it's interactive */
+.envelope-scene.is-ready { cursor: pointer; }
+.envelope-scene.is-ready .envelope { animation: envelope-bob 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.envelope-scene.is-ready .envelope__seal { animation: seal-pulse 2.4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+/* Stop the hint animations once the user has tapped */
+.envelope-scene.is-opened .envelope,
+.envelope-scene.is-opened .envelope__seal { animation: none; }
+
+@keyframes envelope-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes seal-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1);    }
+  50%      { transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Tap hint label below the envelope, only while it's ready */
+.envelope-tap-hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #a07480;
+  opacity: 0;
+  transition: opacity 0.8s ease 0.4s;
+  pointer-events: none;
+  user-select: none;
+  margin-top: -1rem;
+}
+.envelope-scene.is-ready .envelope-tap-hint { opacity: 0.85; }
+.envelope-scene.is-opened .envelope-tap-hint { opacity: 0; transition-delay: 0s; }
+
+/* Hero subtitle beneath envelope */
+.hero-subtitle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #c4949c;
+  opacity: 0;
+  transition: opacity 1s ease 0.5s;
+}
+.hero-subtitle.is-visible {
+  opacity: 1;
+}
+
+/* ---- ENVELOPE WRAPPER ----
+   clip-path clips the bottom edge so the letter (which extends
+   130% tall) never bleeds below the envelope during animation.
+   Large negative top/side insets allow the risen letter to
+   appear fully above and around the envelope. */
+.envelope {
+  position: relative;
+  width: min(420px, 92vw);
+  height: min(300px, 66vw);
+  perspective: 1200px;
+  clip-path: inset(-300% -100% 0 -100%);
+}
+
+/* --- ENVELOPE BACK (SVG) --- */
+.envelope__back {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* --- ENVELOPE FLAP (HTML div for 3D animation; SVG triangle inside provides shape) --- */
+.envelope__flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  /* Flap must remain visible after rotating backward — the back face is shown
+     so it looks like a real folded paper flap behind the envelope body. */
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+  z-index: 4;
+  /* z-index is not transitioned, but using a 0s transition with a delay lets us
+     defer the layer switch to the midpoint of the rotation so it is invisible
+     to the user (the flap is edge-on at that moment). */
+  transition:
+    transform 1.4s cubic-bezier(0.4, 0, 0.15, 1),
+    z-index   0s linear 0.7s;
+}
+
+/* SVG triangle fills the flap div */
+.envelope__flap-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* Paper visible from both sides — back face shows a subtle inner tone */
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+}
+
+/* Flap open state — pure rotation around the top-edge hinge so the flap
+   stays physically attached to the envelope throughout the animation
+   (no translateZ — that would interpolate during rotation and make the
+   hinge edge appear to lift off the envelope). z-index drops below the
+   letter so the risen letter renders fully in front of the open flap. */
+.envelope__flap.is-open {
+  transform: rotateX(-180deg);
+  z-index: 1;
+}
+
+/* --- SIDE FLAPS (SVG triangles, left & right) --- */
+.envelope__side {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  height: 100%;
+  z-index: 2;
+  display: block;
+}
+
+.envelope__side--left {
+  left: 0;
+}
+
+.envelope__side--right {
+  right: 0;
+}
+
+/* --- ENVELOPE FRONT (SVG: two joined triangles meeting at centre) --- */
+.envelope__front {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 55%;
+  display: block;
+  z-index: 3;
+}
+
+/* --- WAX SEAL (SVG organic blob) --- */
+.envelope__seal {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  width: 76px;
+  height: 76px;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.seal-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.envelope__seal.is-hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.8);
+  pointer-events: none;
+}
+
+.seal-initials {
+  font-family: 'Great Vibes', cursive;
+  font-size: 1.05rem;
+  color: #faf3f3;
+  user-select: none;
+  letter-spacing: 0.05em;
+}
+
+/* --- LETTER / INVITATION CARD ---
+   z-index: 2 — letter sits BEHIND the front panel (z:3).
+   The side panels (z:2, later in DOM) naturally render above the letter
+   too, masking its edges while inside. Only the risen portion (above
+   the envelope height) is fully unobstructed — creating a true
+   "sliding out from inside" effect without any JS overflow hacks. */
+.envelope__letter {
+  position: absolute;
+  left: 1%;
+  right: 1%;
+  bottom: 8%;
+  height: 135%;
+  z-index: 2;
+  transform: translateY(72%);
+  opacity: 0;
+  transition:
+    transform 1.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.5s,
+    opacity 0.6s ease 0.5s;
+  overflow: hidden;
+}
+
+.envelope__letter.is-open {
+  transform: translateY(-42%);
+  opacity: 1;
+  overflow: visible;
+}
+
+/* Card inner — uses letter_asset.png as the actual paper/lace design.
+   The image is a lace handkerchief with floral embroidery and a clear
+   centre — text content overlays on top via flexbox centering. */
+.letter-inner {
+  width: 100%;
+  height: 100%;
+  background-image: url('assets/letter_asset.webp');
+  background-size: 105% 130%;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+}
+
+.letter-inner::before,
+.letter-inner::after {
+  content: none;
+}
+
+/* Lace border frame — replaced by letter_asset.png image, no longer needed */
+.letter-lace-border,
+.letter-lace-border::before,
+.letter-lace-border::after,
+.letter-corner {
+  display: none;
+}
+
+/* Letter content — constrained to fit within the clear centre of the lace image */
+.letter-content {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  max-width: 60%;
+  width: 60%;
+}
+
+.letter-ornament {
+  display: block;
+  font-size: 0.7rem;
+  color: #c4949c;
+  letter-spacing: 0.5em;
+  margin-bottom: 0.75rem;
+}
+
+.letter-ornament--bottom {
+  margin-top: 0.75rem;
+  margin-bottom: 0;
+}
+
+.letter-tagline {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #a07480;
+  margin-bottom: 0.6rem;
+}
+
+.letter-names {
+  font-family: 'Great Vibes', cursive;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  color: #3d2a2e;
+  line-height: 1.15;
+  font-weight: 400;
+  margin-bottom: 0.3rem;
+}
+
+.letter-ampersand {
+  font-size: 75%;
+  color: #c4949c;
+}
+
+.letter-invite-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #a07480;
+  margin-bottom: 0.25rem;
+}
+
+.letter-event {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #3d2a2e;
+  margin-bottom: 0.5rem;
+}
+
+.letter-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.85rem;
+  color: #a07480;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+
+
+
+/* ============================================================
+   ============================================================
+   BELOW-HERO — minimal elegant wedding-invitation layout
+   Mobile-first. Light warm background. Centered content.
+   Generous spacing, clean typography, subtle dividers,
+   rounded image cards, soft shadows, brown buttons.
+   ============================================================
+   ============================================================ */
+
+.below-hero {
+  position: relative;
+  background-color: #faf3f3;
+  background-image: url('assets/background.webp?v=2');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: scroll; /* fixed breaks on iOS Safari */
+  background-repeat: no-repeat;
+  color: #3d2a2e;
+  padding-bottom: 2rem;
+  isolation: isolate;
+}
+/* Soft warm overlay so text stays readable while the photo tints through */
+.below-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(250, 243, 243, 0.92) 0%, rgba(250, 243, 243, 0.86) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+.below-hero > * { position: relative; z-index: 1; }
+
+/* Shared centered container — narrow for mobile-feel readability */
+.ig-container {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  text-align: center;
+  position: relative;
+}
+
+/* Generous vertical rhythm between sections */
+.ig-section {
+  padding: clamp(3.5rem, 10vw, 5.5rem) 0;
+  position: relative;
+}
+
+/* Eyebrow micro-label that sits above each section title */
+.ig-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: #a87680;
+  margin-bottom: 1.5rem;
+  margin-top: 80px;
+}
+
+/* Big, calm section title */
+.ig-section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.9rem, 6vw, 2.5rem);
+  font-weight: 300;
+  line-height: 1.25;
+  color: #3d2a2e;
+  letter-spacing: 0.01em;
+  margin-bottom: 10rem;
+}
+
+/* Override the global Armenian font for elements that should keep it */
+.below-hero .ig-section-title { font-family: 'Cormorant Garamond', serif; }
+
+/* Brown/beige rounded button */
+.ig-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 0 2rem;
+  margin-top: 0.4rem;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c08188 0%, #9c6469 100%);
+  color: #fff0ee;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(140, 80, 90, 0.22);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+  cursor: pointer;
+}
+.ig-button:hover  { transform: translateY(-1px); box-shadow: 0 10px 22px rgba(140, 80, 90, 0.28); filter: brightness(1.04); }
+.ig-button:active { transform: translateY(0);   box-shadow: 0 4px 12px rgba(140, 80, 90, 0.22); }
+
+
+/* ============================================================
+   COUPLE — names + photo card
+   ============================================================ */
+.ig-couple {
+  padding-top: clamp(4rem, 12vw, 7rem);
+}
+.ig-couple-names {
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: clamp(2.8rem, 12vw, 4.6rem);
+  line-height: 1.05;
+  color: #3d2a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  margin-bottom: 2.5rem;
+}
+.ig-couple-names .ig-amp {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 0.55em;
+  color: #c08188;
+  margin: 0.1rem 0;
+}
+
+.ig-photo-card {
+  width: min(360px, 80vw);
+  margin: 0 auto;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 18px 44px rgba(140, 90, 100, 0.16), 0 4px 10px rgba(140, 90, 100, 0.08);
+  background: #f0e2e1;
+}
+.ig-photo-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Soft cinematic black-and-white — not harsh */
+  filter: grayscale(1) contrast(0.94) brightness(1.02);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ig-photo-card:hover img { transform: scale(1.03); }
+
+.ig-tagline {
+  margin-top: 2.25rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #876d72;
+}
+
+
+/* ============================================================
+   DATE — calendar-style card
+   ============================================================ */
+.ig-date-card {
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 14px 38px rgba(140, 90, 100, 0.10), 0 2px 6px rgba(140, 90, 100, 0.05);
+  padding: 2.25rem 1.5rem;
+  width: min(360px, 86vw);
+  margin: 0 auto;
+}
+.ig-date-day {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #a87680;
+  margin-bottom: 1.25rem;
+}
+.ig-date-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  border-top: 1px solid rgba(180, 130, 138, 0.25);
+  border-bottom: 1px solid rgba(180, 130, 138, 0.25);
+  padding: 1rem 0;
+}
+.ig-date-side {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: #c69ea2;
+  letter-spacing: 0.05em;
+}
+.ig-date-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.4rem, 14vw, 4.5rem);
+  font-weight: 300;
+  color: #3d2a2e;
+  line-height: 1;
+}
+.ig-date-month {
+  margin-top: 1rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #876d72;
+}
+
+
+/* ============================================================
+   TIMELINE — centred vertical schedule
+   Thin line runs down the centre of the column. Each event sits
+   centred on the line with: icon → time → title → place → sub.
+   ============================================================ */
+.ig-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  width: min(440px, 92vw);
+  text-align: center;
+  position: relative;
+}
+/* Continuous thin connecting line through the centre */
+.ig-timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(180deg,
+    rgba(180, 130, 138, 0)  0%,
+    rgba(180, 130, 138, 0.5) 8%,
+    rgba(180, 130, 138, 0.5) 92%,
+    rgba(180, 130, 138, 0) 100%);
+  transform: translateX(-0.5px);
+}
+.ig-timeline-item {
+  position: relative;
+  padding: 2.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ig-timeline-item:first-child { padding-top: 1rem; }
+.ig-timeline-item:last-child  { padding-bottom: 1rem; }
+
+/* Decorative icon node — sits ON the line, breaks it visually */
+.ig-timeline-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid rgba(180, 130, 138, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.4rem;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 8px 18px rgba(140, 90, 100, 0.08);
+}
+.ig-timeline-icon img,
+.ig-timeline-icon svg {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 1px 1px rgba(140, 90, 100, 0.10));
+}
+
+/* Time — large, bold, the visual anchor */
+.ig-timeline-time {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 9vw, 3rem);
+  font-weight: 300;
+  letter-spacing: 0.04em;
+  color: #3d2a2e;
+  line-height: 1;
+  margin-bottom: 0.85rem;
+}
+
+/* Event title in serif, just below the time */
+.ig-timeline-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.35rem, 5vw, 1.6rem);
+  font-weight: 400;
+  color: #3d2a2e;
+  line-height: 1.25;
+  margin-bottom: 0.35rem;
+  max-width: 22ch;
+}
+
+/* Place / venue name in italic */
+.ig-timeline-place {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  color: #876d72;
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+}
+
+/* Address sub-line — fine print */
+.ig-timeline-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: #a87680;
+  line-height: 1.4;
+}
+
+.timeline-vertical-line {
+  width: 1px;
+  height: 80px;
+  background: rgb(0, 0, 0);
+  margin: 0 auto;
+}
+
+/* ============================================================
+   VENUE LOCATION CARDS — ceremony / reception
+   Detailed illustrations from assets/SVG/ replace the simple icons.
+   ============================================================ */
+.ig-venue-illustration {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto 1.6rem;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  margin-top: 100px;
+}
+.ig-venue-illustration--wide {
+  max-width: 260px;
+  aspect-ratio: 614 / 303;
+}
+.ig-venue-illustration img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 3px 6px rgba(140, 90, 100, 0.10));
+}
+
+.ig-venue-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 400;
+  line-height: 1.25;
+  color: #3d2a2e;
+  margin-bottom: 0.6rem;
+}
+.ig-venue-time {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: #a87680;
+  margin-bottom: 1rem;
+}
+.ig-venue-address {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #876d72;
+  font-style: italic;
+  margin-bottom: 1.75rem;
+}
+
+/* Map button: pin icon on the left of the label */
+.ig-button--with-pin { gap: 0.7rem; padding-left: 1.6rem; }
+.ig-button-pin {
+  width: 14px; height: auto;
+  filter: brightness(0) invert(1);
+  display: block;
+}
+
+
+/* ============================================================
+   GALLERY — stacked card deck (existing JS keeps working)
+   ============================================================ */
+.ig-gallery-section { padding-bottom: clamp(4rem, 10vw, 5.5rem); }
+
+.gallery-stack-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+.gallery-stack {
+  position: relative;
+  width: min(320px, 78vw);
+  aspect-ratio: 3 / 4;
+  cursor: pointer;
+}
+.gallery-card {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #f0e2e1;
+  will-change: transform, opacity;
+  transition:
+    transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity   0.55s ease,
+    box-shadow 0.55s ease;
+}
+.gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  /* Soft cinematic black-and-white — preserves elegance & quality */
+  filter: grayscale(1) contrast(0.94) brightness(1.02);
+}
+.gallery-card.is-active {
+  transform: translate(0, 0) rotate(0) scale(1);
+  z-index: 10; opacity: 1;
+  box-shadow: 0 22px 50px rgba(140, 90, 100, 0.20);
+}
+.gallery-card.is-next {
+  transform: translate(10px, 8px) rotate(2deg) scale(0.97);
+  z-index: 9; opacity: 1;
+  box-shadow: 0 16px 32px rgba(140, 90, 100, 0.14);
+}
+.gallery-card.is-next2 {
+  transform: translate(20px, 16px) rotate(4deg) scale(0.94);
+  z-index: 8; opacity: 0.85;
+  box-shadow: 0 12px 22px rgba(140, 90, 100, 0.10);
+}
+.gallery-card.is-hidden {
+  transform: translate(-110%, 0) rotate(-4deg) scale(0.9);
+  z-index: 1; opacity: 0;
+  pointer-events: none;
+}
+.gallery-card.is-out {
+  transform: translate(-110%, 0) rotate(-6deg) scale(0.88);
+  z-index: 7; opacity: 0;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.35s ease;
+}
+
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+}
+.gallery-btn {
+  background: #ffffff;
+  border: 1px solid rgba(180, 130, 138, 0.3);
+  color: #9c6469;
+  font-size: 1.2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.3s, border-color 0.3s, color 0.3s;
+  flex-shrink: 0;
+}
+.gallery-btn:hover {
+  background: #9c6469;
+  border-color: #9c6469;
+  color: #fff;
+}
+.gallery-dots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.gallery-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(180, 130, 138, 0.3);
+  cursor: pointer;
+  transition: background 0.3s, transform 0.3s;
+}
+.gallery-dot.is-active { background: #9c6469; transform: scale(1.4); }
+
+
+/* ============================================================
+   RSVP FORM
+   ============================================================ */
+.ig-rsvp-intro {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.15rem, 4.4vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: #3d2a2e;
+  margin-bottom: 2.2rem;
+}
+.ig-rsvp-intro strong {
+  font-weight: 500;
+  color: #3d2a2e;
+}
+
+.ig-rsvp-form {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: 22px;
+  padding: 1.75rem 1.5rem 2rem;
+  box-shadow: 0 14px 38px rgba(140, 90, 100, 0.10), 0 2px 6px rgba(140, 90, 100, 0.05);
+}
+
+/* Single-input field block */
+.ig-field { margin-bottom: 1.6rem; }
+.ig-field:last-of-type { margin-bottom: 0; }
+
+/* Hide native number-input spinners for a cleaner look */
+.ig-input[type="number"]::-webkit-outer-spin-button,
+.ig-input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.ig-input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+
+/* Shared label / legend */
+.ig-field-label {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: #3d2a2e;
+  line-height: 1.55;
+  margin-bottom: 0.9rem;
+  padding: 0;
+}
+
+/* Native text input — borderless, underline only */
+.ig-input {
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  color: #3d2a2e;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(180, 130, 138, 0.45);
+  outline: none;
+  padding: 0.65rem 0.2rem;
+  transition: border-color 0.25s ease;
+}
+.ig-input::placeholder { color: rgba(80, 50, 55, 0.42); }
+.ig-input:focus { border-bottom-color: #9c6469; }
+
+/* Thin section divider inside the form */
+.ig-form-divider {
+  border: none;
+  height: 1px;
+  background: rgba(180, 130, 138, 0.22);
+  margin: 1.5rem 0;
+}
+
+/* Group of radios / checkboxes */
+.ig-field-group {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+/* Radio + checkbox shared row */
+.ig-radio,
+.ig-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  cursor: pointer;
+  user-select: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.96rem;
+  color: #3d2a2e;
+  font-weight: 400;
+}
+.ig-radio input,
+.ig-checkbox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Radio mark — circle */
+.ig-radio-mark {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(180, 130, 138, 0.55);
+  background: #ffffff;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+.ig-radio-mark::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #9c6469;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.2s ease;
+}
+.ig-radio input:checked + .ig-radio-mark { border-color: #9c6469; }
+.ig-radio input:checked + .ig-radio-mark::after { transform: translate(-50%, -50%) scale(1); }
+.ig-radio input:focus-visible + .ig-radio-mark { box-shadow: 0 0 0 3px rgba(180, 130, 138, 0.18); }
+
+/* Checkbox mark — square */
+.ig-checkbox-mark {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1.5px solid rgba(180, 130, 138, 0.55);
+  background: #ffffff;
+  position: relative;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.ig-checkbox-mark::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 6px; height: 11px;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: translate(-50%, -60%) rotate(45deg) scale(0);
+  transition: transform 0.2s ease;
+}
+.ig-checkbox input:checked + .ig-checkbox-mark {
+  border-color: #9c6469;
+  background: #9c6469;
+}
+.ig-checkbox input:checked + .ig-checkbox-mark::after { transform: translate(-50%, -60%) rotate(45deg) scale(1); }
+.ig-checkbox input:focus-visible + .ig-checkbox-mark { box-shadow: 0 0 0 3px rgba(180, 130, 138, 0.18); }
+
+.ig-radio-text,
+.ig-checkbox-text { line-height: 1.4; }
+
+/* Submit button — full-width inside the form, brown pill */
+.ig-button--submit {
+  width: 100%;
+  margin-top: 1.5rem;
+  letter-spacing: 0.28em;
+  font-size: 0.84rem;
+}
+.ig-button--submit:disabled {
+  cursor: progress;
+  filter: brightness(0.92);
+  opacity: 0.85;
+}
+
+/* Inline status line for RSVP submit feedback */
+.ig-rsvp-status {
+  margin-top: 1rem;
+  min-height: 1.4rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+  color: #876d72;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+.ig-rsvp-status.is-visible { opacity: 1; }
+.ig-rsvp-status.is-success { color: #5d7c4a; }
+.ig-rsvp-status.is-error   { color: #a8513e; }
+
+
+/* ============================================================
+   BOTTOM HERO — full-bleed B&W couple photo with elegant overlay
+   Sits flush to the section above; breaks out of the .ig-container
+   width to span the full viewport.
+   ============================================================ */
+.ig-bottom-hero {
+  position: relative;
+  width: 100%;
+  min-height: 78vh;
+  margin-top: 2rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  isolation: isolate;
+}
+
+/* Photo layer — absolutely positioned, B&W, slightly toned */
+.ig-bottom-hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.ig-bottom-hero-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Soft cinematic B&W — keeps depth and warmth without harsh contrast */
+  filter: grayscale(1) contrast(0.92) brightness(1.04);
+}
+
+/* Soft overlay so text remains readable */
+.ig-bottom-hero-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(180deg,
+      rgba(250, 243, 243, 0.55) 0%,
+      rgba(250, 243, 243, 0.40) 40%,
+      rgba(250, 243, 243, 0.55) 100%);
+  pointer-events: none;
+}
+
+/* Centred text content — script names, eyebrow, date */
+.ig-bottom-hero-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 720px;
+  padding: clamp(4rem, 12vw, 7rem) 1.5rem;
+  text-align: center;
+}
+.ig-closing-script {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: clamp(1.1rem, 3.6vw, 1.35rem);
+  color: #9c6469;
+  margin-bottom: 0.5rem;
+}
+.ig-closing-names {
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: clamp(3.4rem, 13vw, 6rem);
+  line-height: 1.05;
+  color: #3d2a2e;
+  margin-bottom: 1.6rem;
+  text-shadow: 0 2px 16px rgba(255, 255, 255, 0.35);
+}
+.ig-closing-date {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.55em;
+  text-transform: uppercase;
+  color: #9c6469;
+}
+
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.ig-footer {
+  padding: 1.75rem 1rem;
+  text-align: center;
+  border-top: 1px solid rgba(180, 130, 138, 0.18);
+}
+.ig-footer p {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: #a87680;
+  font-weight: 400;
+}
+
+
+/* ============================================================
+   Override global Armenian font on the new section eyebrows /
+   subs / addresses so they use Inter / Cormorant, not Noto Serif Armenian
+   (the global rule was scoped to specific class names; new classes are
+   not affected, but explicitly assert family for clarity).
+   ============================================================ */
+.ig-eyebrow,
+.ig-button,
+.ig-timeline-time,
+.ig-venue-time,
+.ig-closing-date,
+.ig-footer p,
+.ig-date-day { font-family: 'Inter', sans-serif; font-variation-settings: normal; }
+
+
+/* ============================================================
+   RESPONSIVE — desktop widening
+   On wider screens we keep the mobile-first stack but allow the
+   couple photo and gallery card to grow proportionally.
+   ============================================================ */
+@media (min-width: 720px) {
+  .ig-container { max-width: 580px; }
+  .ig-photo-card { width: 380px; }
+  .gallery-stack { width: 360px; }
+}
+
+
+/* ============================================================
+   RESPONSIVE — tiny phones
+   ============================================================ */
+@media (max-width: 380px) {
+  .ig-container { padding: 0 1.2rem; }
+  .ig-section { padding: clamp(3rem, 12vw, 4rem) 0; }
+  .ig-button { letter-spacing: 0.18em; padding: 0 1.6rem; }
+}
+
+
+/* ============================================================
+   ENVELOPE — small-screen sizing (preserved from old CSS)
+   ============================================================ */
+@media (max-width: 580px) {
+  .envelope { width: 90vw; height: 64vw; }
+  .intro-skip {
+    bottom: 1.5rem; right: 1.5rem;
+    padding: 0.5rem 1rem; font-size: 0.65rem;
+  }
+}

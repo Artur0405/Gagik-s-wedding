@@ -1,0 +1,65 @@
+# ============================================================
+#  Gagik & Julia — wedding site .gitignore
+# ============================================================
+
+# ---- macOS system files ----
+.DS_Store
+.DS_Store?
+._*
+.AppleDouble
+.AppleDB
+.AppleDesktop
+.Spotlight-V100
+.Trashes
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+Icon?
+Network Trash Folder
+Temporary Items
+
+# ---- Windows system files ----
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.stackdump
+
+# ---- Linux temp files ----
+*~
+.directory
+.Trash-*
+.fuse_hidden*
+.nfs*
+
+# ---- Editor / IDE noise ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
+.history/
+
+# ---- Generic temp / backup / log ----
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+*.log
+
+# ---- Local secrets / env (just in case) ----
+.env
+.env.local
+.env.*.local
+
+# ---- Node / build artefacts (defensive — not used here yet) ----
+node_modules/
+dist/
+build/
+.cache/
