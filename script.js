@@ -53,24 +53,57 @@ document.addEventListener('DOMContentLoaded', () => {
   if (introVideo) {
     introVideo.addEventListener('ended', dismissIntro, { once: true });
 
-    // Fallback: if the video fails to load/play (e.g., unsupported codec,
-    // file path error), dismiss automatically after 1 second so the site
-    // is never stuck on the overlay.
+    // Real load failure (404, unsupported codec, etc.) → don't strand the user
     introVideo.addEventListener('error', () => {
       console.warn('[Wedding] Intro video failed to load. Skipping intro.');
       dismissIntro();
     }, { once: true });
 
-    // Additional fallback: if video hasn't started playing within 4 s,
-    // dismiss (covers cases where autoplay is blocked silently).
+    /* ------------------------------------------------------------
+       Best-effort autoplay nudge.
+       The HTML `autoplay` attribute is the primary mechanism — what
+       we do here is just call .play() at every media-load milestone
+       so browsers that ignore the attribute (or were interrupted by
+       a tab restore, BFCache, low-power mode, etc.) still get a fresh
+       play() call.
+
+       IMPORTANT: a rejected play() promise is NOT a reason to skip
+       the intro. .play() routinely rejects with AbortError when the
+       browser is already starting playback via the autoplay attribute
+       — those rejections are harmless. We only abandon the intro on a
+       genuine `error` event or when the video has truly never started
+       after a generous timeout (see below).
+    ------------------------------------------------------------ */
+    function attemptAutoplay() {
+      // Re-assert muted on every attempt — required for mobile autoplay
+      introVideo.muted = true;
+      introVideo.defaultMuted = true;
+      const p = introVideo.play();
+      if (p && typeof p.catch === 'function') {
+        p.catch((err) => {
+          // Log only — do NOT dismiss the intro. Another retry on the
+          // next media event (or the autoplay attribute itself) will
+          // succeed in the vast majority of cases.
+          console.warn('[Wedding] play() rejected (harmless — will retry):', err && err.name);
+        });
+      }
+    }
+    // Initial nudge, then again whenever the media reaches a new readiness state
+    attemptAutoplay();
+    introVideo.addEventListener('loadedmetadata', attemptAutoplay);
+    introVideo.addEventListener('canplay',        attemptAutoplay);
+    introVideo.addEventListener('canplaythrough', attemptAutoplay);
+
+    // True-failure fallback: 5 seconds in, if the video has NEVER actually
+    // advanced (still paused at currentTime === 0) we accept that this
+    // browser is blocking autoplay entirely and dismiss the overlay so
+    // the user isn't left staring at a paused frame forever.
     const introTimeout = setTimeout(() => {
-      if (introVideo.paused || introVideo.readyState < 2) {
-        console.warn('[Wedding] Intro video did not autoplay. Dismissing overlay.');
+      if (introVideo.paused && introVideo.currentTime === 0) {
+        console.warn('[Wedding] Intro video did not start within 5s. Dismissing.');
         dismissIntro();
       }
-    }, 4000);
-
-    // Cancel the timeout if the video plays normally
+    }, 5000);
     introVideo.addEventListener('playing', () => clearTimeout(introTimeout), { once: true });
   } else {
     // No video element found — show site immediately
