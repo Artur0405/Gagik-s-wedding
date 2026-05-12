@@ -54,23 +54,59 @@ document.addEventListener('DOMContentLoaded', () => {
     introVideo.addEventListener('ended', dismissIntro, { once: true });
 
     // Fallback: if the video fails to load/play (e.g., unsupported codec,
-    // file path error), dismiss automatically after 1 second so the site
-    // is never stuck on the overlay.
+    // file path error), dismiss automatically so the site is never stuck.
     introVideo.addEventListener('error', () => {
       console.warn('[Wedding] Intro video failed to load. Skipping intro.');
       dismissIntro();
     }, { once: true });
 
-    // Additional fallback: if video hasn't started playing within 4 s,
-    // dismiss (covers cases where autoplay is blocked silently).
+    /* ------------------------------------------------------------
+       Force-trigger autoplay programmatically. The `autoplay` HTML
+       attribute alone is silently blocked by some mobile browsers
+       (iOS Safari Low-Power Mode, Chrome with low-engagement signal,
+       etc.). Asserting `muted=true` and calling .play() inside the
+       initial render tick — and again when the media is fully ready
+       — covers every browser quirk I'm aware of.
+
+       If play() is rejected, autoplay is unrecoverable for this
+       page load, so we dismiss the overlay immediately instead of
+       leaving the user staring at a native "tap to play" button.
+    ------------------------------------------------------------ */
+    let autoplayHandled = false;
+    function attemptAutoplay() {
+      if (autoplayHandled) return;
+      // Re-assert muted on every attempt so the autoplay policy is satisfied
+      introVideo.muted = true;
+      introVideo.defaultMuted = true;
+      const p = introVideo.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => { autoplayHandled = true; })
+         .catch((err) => {
+           if (autoplayHandled) return;
+           autoplayHandled = true;
+           console.warn('[Wedding] Autoplay blocked, skipping intro:', err);
+           dismissIntro();
+         });
+      } else {
+        autoplayHandled = true;
+      }
+    }
+
+    // Try right now (the element exists), then on every "ready" milestone
+    attemptAutoplay();
+    introVideo.addEventListener('loadedmetadata', attemptAutoplay);
+    introVideo.addEventListener('canplay',        attemptAutoplay);
+    introVideo.addEventListener('canplaythrough', attemptAutoplay);
+
+    // Belt-and-braces timeout: if for any reason playback has not started
+    // within 2.5 s (e.g. silent autoplay block on an obscure browser),
+    // dismiss the overlay so the user is not stuck on a paused video.
     const introTimeout = setTimeout(() => {
       if (introVideo.paused || introVideo.readyState < 2) {
-        console.warn('[Wedding] Intro video did not autoplay. Dismissing overlay.');
+        console.warn('[Wedding] Intro video did not start in time. Dismissing.');
         dismissIntro();
       }
-    }, 4000);
-
-    // Cancel the timeout if the video plays normally
+    }, 2500);
     introVideo.addEventListener('playing', () => clearTimeout(introTimeout), { once: true });
   } else {
     // No video element found — show site immediately
